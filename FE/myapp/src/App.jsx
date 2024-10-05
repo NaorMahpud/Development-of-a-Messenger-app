@@ -22,9 +22,9 @@ function App() {
         <Route path='/signup' element={<Registration />} />
         <Route path='/dashboard' element={<Dashboard />}>
           <Route path='send-message' element={<SendMessage />} />
-          <Route path='groups' element={<Groups />} >
-            <Route path='creategroup' element={<CreateGroup />} />
-          </Route>
+          <Route path='groups' element={<Groups />} />
+          <Route path='creategroup' element={<CreateGroup />} />
+
           <Route path='blocks' element={<BlockUser />} />
           <Route path='message-history' element={<MessageHistory />} />
 

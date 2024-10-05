@@ -10,7 +10,6 @@ const Groups = () => {
     const [currentGroupName, setCurrentGroupName] = useState('')
     const [messages, setMessages] = useState([]); // הודעות בקבוצה הנוכחית
     const [newMessage, setNewMessage] = useState(''); // ההודעה החדשה לשליחה
-    const [on, setOn] = useState(false)
     const token = sessionStorage.getItem('token');
     const userId = sessionStorage.getItem('userId'); // מזהה המשתמש
 
@@ -33,7 +32,6 @@ const Groups = () => {
 
         fetchGroups();
     }, [token]);
-
 
 
     // הצטרפות לחדר של קבוצה
@@ -85,17 +83,7 @@ const Groups = () => {
             setNewMessage(''); // נקה את שדה ההודעה לאחר השליחה
         }
     };
-    const createNavigation = () => {
-        if (!on) {
-            navigate('/dashboard/groups/creategroup')
-            setOn(true)
-        } else {
-            navigate('/dashboard/groups')
-            setOn(false)
-        }
-    }
-
-
+   
 
     return (
         <Container maxWidth="sm" style={{ textAlign: 'center', }}>
@@ -117,7 +105,7 @@ const Groups = () => {
                     </Typography>
                 )}
             </List>
-            <Button onClick={createNavigation} color="primary" variant="contained">Create Group</Button>
+           
             <br /> <br />
             <Outlet />
             {currentGroup && (

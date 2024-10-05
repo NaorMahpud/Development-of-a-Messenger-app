@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { List, ListItem, ListItemText, Container, Typography, Button, TextField, Box } from '@mui/material';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 export default function CreateGroup() {
     const [users, setUsers] = useState([]); // שמירת כל המשתמשים באפליקציה לצורך בחירה ביצירת קבוצה
@@ -8,7 +9,7 @@ export default function CreateGroup() {
     const [groupName, setGroupName] = useState(''); // שם הקבוצה החדשה
     const token = sessionStorage.getItem('token');
     const userId = sessionStorage.getItem('userId'); // מזהה המשתמש
-
+    const navigate = useNavigate()
 
     // הבאת כל המשתמשים לצורך בחירה ביצירת קבוצה
     useEffect(() => {
@@ -52,12 +53,12 @@ export default function CreateGroup() {
                     Authorization: `Bearer ${token}`
                 }
             });
-            
-            window.location.reload()
             navigate('/dashboard/groups')
+            window.location.reload()
+            
             setGroupName(''); // איפוס שם הקבוצה לאחר יצירתה
             setSelectedUsers([]); // איפוס בחירת המשתמשים
-            
+
         } catch (error) {
             console.error('Error creating group:', error);
         }
@@ -66,8 +67,8 @@ export default function CreateGroup() {
 
 
     return (
-        <Container>
-            <Typography variant="h5" gutterBottom>
+        <Container style={{marginBottom: "300px"}}>
+            <Typography variant="h4" gutterBottom>
                 Create a New Group
             </Typography>
             <TextField
@@ -75,6 +76,7 @@ export default function CreateGroup() {
                 value={groupName}
                 onChange={(e) => setGroupName(e.target.value)}
                 fullWidth
+                style={{ width: "800px" }}
             />
             <br /> <br />
 

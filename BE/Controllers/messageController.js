@@ -15,7 +15,7 @@ router.post('/', authenticateToken, async (req, res) => {
         // בדיקה אם השולח חסום
         const sender = await User.findById(senderId);
         if (sender.isBlocked) {
-            return res.status(403).json({ message: 'You are blocked from sending messages' });
+            return res.status(403).json({ message: 'You are blocked by this user' });
         }
 
         // אם מדובר בנמען יחיד
@@ -32,7 +32,7 @@ router.post('/', authenticateToken, async (req, res) => {
             });
 
             await message.save();
-            
+
             return res.status(201).json({ message: 'Message sent successfully' });
         }
 
@@ -50,7 +50,7 @@ router.post('/', authenticateToken, async (req, res) => {
             });
 
             await message.save();
-            
+
 
             return res.status(201).json({ message: 'Message sent successfully' });
         }
@@ -61,17 +61,23 @@ router.post('/', authenticateToken, async (req, res) => {
 
 // קבלת היסטוריית השיחות האחרונות
 router.get('/history', authenticateToken, async (req, res) => {
-    const userId = req.user.userId;
+    const userId = req.user.userId; // מזהה המשתמש הנוכחי
+
     try {
-        const messages = await Message.find({ senderId: userId })
+        // שליפת ההודעות שהמשתמש שלח או קיבל, מוגבלות ל-20 האחרונות
+        const messages = await Message.find({
+            $or: [
+                { senderId: userId },
+                { recipientId: userId } 
+            ]
+        })
             .sort({ timestamp: -1 }) // סדר מהעדכני לישן
-            .limit(20); // הגבלת כמות ההודעות
+            .limit(20); 
 
         res.status(200).json(messages);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching message history', error });
     }
 });
-
 
 module.exports = router;

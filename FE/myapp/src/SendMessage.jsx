@@ -5,15 +5,16 @@ import socket from './socket';
 
 
 const SendMessage = () => {
-    const [users, setUsers] = useState([]); // כל המשתמשים
+    const [users, setUsers] = useState([]); 
     const [messages, setMessages] = useState([]);
-    const [recipientId, setRecipientId] = useState(''); // הנמען הנבחר
+    const [recipientId, setRecipientId] = useState(''); 
     const [content, setContent] = useState('');
+    const [status, setStatus] = useState('')
 
     const token = sessionStorage.getItem('token');
     const userId = sessionStorage.getItem('userId');
 
-    // הבאת כל המשתמשים מהשרת
+    
     const fetchUsers = async () => {
         try {
             const { data } = await axios.get('http://localhost:3000/api/users', {
@@ -23,20 +24,38 @@ const SendMessage = () => {
             });
             setUsers(data);
         } catch (error) {
-            console.log(error);
+            setStatus(error.response.data.message);
         }
     };
 
     useEffect(() => {
         fetchUsers();
     }, []);
-    
+
+    useEffect(() => {
+        if (recipientId) {
+            // הצטרפות לצ'אט פרטי ושליפת ההודעות השמורות
+            socket.emit('joinPrivateChat', { userId: sessionStorage.getItem('userId'), recipientId });
+
+            // האזנה להודעות השמורות שמתקבלות מהשרת
+            socket.on('loadPrivateMessages', (loadedMessages) => {
+                setMessages(loadedMessages); 
+            });
+
+            return () => {
+                socket.off('loadPrivateMessages');
+            };
+        }
+    }, [recipientId]);
+
 
     useEffect(() => {
         const handleReceiveMessage = (message) => {
             setMessages((prevMessages) => [...prevMessages, message]);
         };
-
+        socket.on('privateMessages', (messages) => {
+            setMessages(messages)
+        })
         socket.on('receiveMessage', handleReceiveMessage);
 
         return () => {
@@ -46,17 +65,7 @@ const SendMessage = () => {
 
     const handleSendMessage = async (e) => {
         e.preventDefault();
-
         try {
-            await axios.post('http://localhost:3000/api/messages', {
-                recipientId,
-                content
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-
             // שליחת ההודעה גם דרך Socket.IO
             socket.emit("sendMessage", {
                 recipientId,
@@ -150,7 +159,10 @@ const SendMessage = () => {
                     ))}
                 </ul>
             </Box>
-            
+
+            <Typography variant="h5" style={{ marginTop: '20px', textAlign: 'center' }}>
+                {status}
+            </Typography>
         </Container>
     );
 };

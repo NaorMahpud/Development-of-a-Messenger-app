@@ -7,20 +7,20 @@ const MessageHistory = () => {
     const token = sessionStorage.getItem('token');
 
     useEffect(() => {
-        const fetchMessages = async () => {
+        const fetchHistoryMessages = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/api/messages/history', {
+                const { data } = await axios.get('http://localhost:3000/api/messages/history', {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
                 });
-                setMessages(response.data);
+                setMessages(data);
             } catch (error) {
                 console.error('Error fetching message history:', error.response.data);
             }
         };
 
-        fetchMessages();
+        fetchHistoryMessages();
     }, [token]);
 
     return (
@@ -28,10 +28,10 @@ const MessageHistory = () => {
             <Typography variant="h4" gutterBottom>
                 Message History
             </Typography>
-            <List style={{ border: "2px solid back" }}>
+            <List style={{ border: "2px solid back", overflowY: 'scroll', maxHeight: "750px" }}>
                 {messages.length > 0 ? (
                     messages.map((message, index) => (
-                        <ListItem key={index}>
+                        <ListItem key={index} >
                             <ListItemText
                                 primary={`${message.senderId}: ${message.content}`}
                                 secondary={new Date(message.timestamp).toLocaleString()}

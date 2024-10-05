@@ -48,6 +48,15 @@ const Dashboard = () => {
                     color="primary"
                     style={{ marginBottom: '10px' }}
                     fullWidth
+                    onClick={() => navigate('/dashboard/creategroup')}
+                >
+                    Create Group
+                </Button>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    style={{ marginBottom: '10px' }}
+                    fullWidth
                     onClick={() => navigate('/dashboard/message-history')}
                 >
                     Message History
@@ -84,7 +93,7 @@ const Dashboard = () => {
             >
                 <Outlet />
 
-                
+
             </Box>
         </Box>
     );

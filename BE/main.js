@@ -20,7 +20,6 @@ mongoose.connect('mongodb://localhost:27017/WHATSAPPDB').then(() => { console.lo
     .catch((err) => { console.error('Failed to connect to MongoDB', err); });
 
 
-const jwt = require('jsonwebtoken');
 const { authenticateToken } = require('./Middleware/checkToken');
 
 const Message = require('./Models/messageModel')
@@ -34,17 +33,41 @@ io.on('connection', (socket) => {
 
 
     // // שליחת הודעה למשתמש אחר
-    socket.on('sendMessage', ({ recipientId, content, senderId }) => {
-        const message = {
+    socket.on('sendMessage', async ({ recipientId, content, senderId }) => {
+        const message = new Message({
             senderId,
             recipientId,
             content,
             timestamp: new Date(),
-        };
+        });
+        try {
+            await message.save()
+            io.to(recipientId).emit('receiveMessage', message);
+            io.to(senderId).emit('receiveMessage', message);
 
-        io.to(recipientId).emit('receiveMessage', message);
-        io.to(senderId).emit('receiveMessage', message);
+        } catch (error) {
+            console.error('Error fetching messages:', error);
+        }
 
+
+
+    });
+
+    socket.on('joinPrivateChat', async ({ userId, recipientId }) => {
+        try {
+            // שליפת כל ההודעות בין המשתמשים (שני הצדדים)
+            const messages = await Message.find({
+                $or: [
+                    { senderId: userId, recipientId },
+                    { senderId: recipientId, recipientId: userId }
+                ]
+            }).sort({ timestamp: 1 });
+
+            // שליחת ההודעות השמורות למשתמש
+            socket.emit('loadPrivateMessages', messages);
+        } catch (error) {
+            console.error('Error loading messages:', error);
+        }
     });
 
     // הצטרפות לקבוצה
@@ -105,11 +128,6 @@ io.on('connection', (socket) => {
         }
     });
 
-    // חסימת משתמש
-    socket.on('blockUser', ({ blockedUserId }) => {
-        // לוגיקה של חסימה
-        console.log(`User ${userId} blocked user ${blockedUserId}`);
-    });
 
     // ניתוק משתמש
     socket.on('disconnect', () => {
