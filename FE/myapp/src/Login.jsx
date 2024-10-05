@@ -6,6 +6,7 @@ import axios from 'axios';
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [message, setMessage] = useState(null)
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
@@ -17,12 +18,20 @@ const Login = () => {
             });
             sessionStorage.setItem('userId', data.userId)
             sessionStorage.setItem('token', data.token);
-            navigate('/dashboard');
+            setMessage("Logging in....")
+            setTimeout(() => {
+                navigate('/dashboard');
+            }, 1000)
         } catch (error) {
             console.error('Login error:', error);
-            alert('Login failed. Please check your credentials.');
+            setMessage(error.response.data.message);
+            setTimeout(() => {
+                setMessage(null)
+            }, 2500);
         }
     };
+
+
 
     return (
         <Container maxWidth="sm" style={{ marginTop: '100px', textAlign: 'center' }}>
@@ -47,9 +56,14 @@ const Login = () => {
                     fullWidth
                     required
                 />
-                <Button type="submit" variant="contained" color="primary" fullWidth>
-                    Login
-                </Button>
+                {message && (
+                    <Typography color="error" style={{ marginTop: '10px', fontSize: "22px" }}>
+                        {message}
+                    </Typography>
+                )}
+                <Button type="submit" variant="contained" color="primary" fullWidth>Login</Button>
+                <Button variant="contained" color="secondary" onClick={() => navigate('/signup')}>Register</Button>
+
             </form>
         </Container>
     );

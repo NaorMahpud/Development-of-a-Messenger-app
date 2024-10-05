@@ -63,7 +63,7 @@ const BlockUser = () => {
                 Users List
             </Typography>
             <List>
-                {users.length > 0 ? (
+                {users.length > 1 ? (
                     users.filter(user => user._id !== userId).map(user => (
                         <ListItem style={{ border: "1px solid black" }} key={user._id}>
                             <ListItemText primary={user.username} />

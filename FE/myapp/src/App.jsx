@@ -8,6 +8,7 @@ import MessageHistory from './MessageHistory';
 import SendMessage from './SendMessage';
 import CreateGroup from './CreateGroup';
 import BlockUser from './BlockUser';
+import Registration from './Register';
 
 function App() {
 
@@ -18,6 +19,7 @@ function App() {
     <Router>
       <Routes>
         <Route path='/' element={<Login />} />
+        <Route path='/signup' element={<Registration />} />
         <Route path='/dashboard' element={<Dashboard />}>
           <Route path='send-message' element={<SendMessage />} />
           <Route path='groups' element={<Groups />} >

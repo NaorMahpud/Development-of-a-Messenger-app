@@ -5,10 +5,6 @@ import socket from './socket';
 
 const Dashboard = () => {
     const navigate = useNavigate();
-    const token = sessionStorage.getItem('token');
-    const userId = sessionStorage.getItem('userId');
-
-    
 
     const handleLogout = () => {
         sessionStorage.clear();

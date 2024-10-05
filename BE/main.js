@@ -34,18 +34,16 @@ io.on('connection', (socket) => {
 
 
     // // שליחת הודעה למשתמש אחר
-    socket.on('sendMessage', (data) => {
+    socket.on('sendMessage', ({ recipientId, content, senderId }) => {
+        const message = {
+            senderId,
+            recipientId,
+            content,
+            timestamp: new Date(),
+        };
 
-        io.to(data.recipientId).emit('receiveMessage', {
-            senderId: data.senderId,
-            content: data.content,
-            timestamp: Date.now()
-        });
-        io.to(data.senderId).emit('receiveMessage', {
-            senderId: data.senderId,
-            content: data.content,
-            timestamp: Date.now()
-        });
+        io.to(recipientId).emit('receiveMessage', message);
+        io.to(senderId).emit('receiveMessage', message);
 
     });
 

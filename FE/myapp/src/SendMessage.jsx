@@ -1,21 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Container, Typography, Box } from '@mui/material';
+import { TextField, Button, Container, Typography, Box, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
 import axios from 'axios';
 import socket from './socket';
 
 
 const SendMessage = () => {
+    const [users, setUsers] = useState([]); // כל המשתמשים
     const [messages, setMessages] = useState([]);
-    const [recipientId, setRecipientId] = useState('');
+    const [recipientId, setRecipientId] = useState(''); // הנמען הנבחר
     const [content, setContent] = useState('');
-    const [status, setStatus] = useState('');
 
     const token = sessionStorage.getItem('token');
+    const userId = sessionStorage.getItem('userId');
+
+    // הבאת כל המשתמשים מהשרת
+    const fetchUsers = async () => {
+        try {
+            const { data } = await axios.get('http://localhost:3000/api/users', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            setUsers(data);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    useEffect(() => {
+        fetchUsers();
+    }, []);
+    
 
     useEffect(() => {
         const handleReceiveMessage = (message) => {
             setMessages((prevMessages) => [...prevMessages, message]);
-            console.log('Received message:', message);
         };
 
         socket.on('receiveMessage', handleReceiveMessage);
@@ -45,8 +64,6 @@ const SendMessage = () => {
                 senderId: sessionStorage.getItem('userId'),
             });
 
-
-            setStatus('Message sent successfully!');
             setContent(''); // נקה את שדה ההודעה לאחר השליחה
         } catch (error) {
             setStatus(error.response.data.message);
@@ -60,14 +77,41 @@ const SendMessage = () => {
                 Send a Message
             </Typography>
             <form onSubmit={handleSendMessage} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <TextField
-                    label="Recipient ID"
-                    variant="outlined"
-                    value={recipientId}
-                    onChange={(e) => setRecipientId(e.target.value)}
-                    fullWidth
-                    required
-                />
+                <FormControl fullWidth>
+                    <InputLabel id="recipient-select-label1">Recipient</InputLabel>
+
+                    {users.length > 1 ? (
+                        <Select
+                            labelId="recipient-select-label1"
+                            value={recipientId}
+                            onChange={(e) => setRecipientId(e.target.value)}
+                            fullWidth
+                            required
+                        >
+                            {users.filter(user => user._id !== userId).map((user) => (
+                                <MenuItem key={user._id} value={user._id}>
+                                    {user.username}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    ) : (
+
+                        <Select
+                            labelId="recipient-select-label2"
+                            value={recipientId}
+                            fullWidth
+                            required
+                        >
+                            {users.filter(user => user._id !== userId).map((user) => (
+                                <MenuItem key={user._id} value={user._id}>
+                                    {user.username}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    )
+                    }
+                </FormControl>
+
                 <TextField
                     label="Message"
                     variant="outlined"
@@ -91,7 +135,7 @@ const SendMessage = () => {
                 style={{
                     width: '100%',
                     maxWidth: '600px',
-                    height: '300px',
+                    height: '200px',
                     overflowY: 'scroll',
                     border: '1px solid #ccc',
                     padding: '10px',
@@ -106,7 +150,7 @@ const SendMessage = () => {
                     ))}
                 </ul>
             </Box>
-            {status && <Typography style={{ marginTop: '20px' }}>{status}</Typography>}
+            
         </Container>
     );
 };
