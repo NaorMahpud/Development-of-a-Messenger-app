@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TextField, Button, Container, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -30,7 +30,16 @@ const Login = () => {
             }, 2500);
         }
     };
-
+    useEffect(() => {
+        const msg = sessionStorage.getItem('msg')
+        if (msg) {
+            setMessage(msg)
+            sessionStorage.clear()
+            setTimeout(() => {
+                setMessage(null)
+            }, 2500);
+        }
+    })
 
     return (
         <Container maxWidth="sm" style={{ marginTop: '100px', textAlign: 'center' }}>
