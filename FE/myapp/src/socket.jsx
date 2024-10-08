@@ -1,7 +1,11 @@
-import io from 'socket.io-client';
+import { io } from 'socket.io-client';
 
-const socket = io('http://localhost:3000', {
-    query: { userId: sessionStorage.getItem('userId') }, // העברת userId ב-query params
-});
+let socket;
+const userId = sessionStorage.getItem('userId')
+if (userId) {
+    socket = io('http://localhost:3000', {
+        query: { userId }, // העברת userId ב-query params
+    });
+}
 
 export default socket

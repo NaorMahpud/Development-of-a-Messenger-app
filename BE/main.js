@@ -29,8 +29,6 @@ const Group = require('./Models/groupModel')
 io.on('connection', (socket) => {
     const userId = socket.handshake.query.userId;
     socket.join(userId)
-    console.log('User connected', userId);
-
 
     // // שליחת הודעה למשתמש אחר
     socket.on('sendMessage', async ({ recipientId, content, senderId }) => {
@@ -48,9 +46,6 @@ io.on('connection', (socket) => {
         } catch (error) {
             console.error('Error fetching messages:', error);
         }
-
-
-
     });
 
     socket.on('joinPrivateChat', async ({ userId, recipientId }) => {

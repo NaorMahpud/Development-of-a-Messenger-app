@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Container, Typography, Box } from '@mui/material';
+import React from 'react';
+import { Button, Typography, Box } from '@mui/material';
 import { Outlet, useNavigate } from 'react-router-dom';
-import socket from './socket';
+
 
 const Dashboard = () => {
     const navigate = useNavigate();
@@ -13,7 +13,6 @@ const Dashboard = () => {
 
     return (
         <Box display="flex" style={{ height: '100vh' }}>
-            {/* Sidebar for navigation */}
             <Box
                 style={{
                     width: '25%',
